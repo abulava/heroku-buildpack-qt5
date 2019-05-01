@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir> <env-dir>
+
+# fail fast
+set -e
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+BP_DIR=`cd $(dirname $0); cd ..; pwd`
+QT_BIN_DIR=".apt/usr/lib/x86_64-linux-gnu/qt5/bin"
+
+function error() {
+	echo " !     $*" >&2
+	exit 1
+}
+
+function topic() {
+	echo "-----> $*"
+}
+
+configure_qt() {
+	topic "Configuring QT, writing qt.conf"
+
+# /tmp/build/.apt/usr/lib/x86_64-linux-gnu/qt5/bin/qt.conf
+##[Paths]
+##Prefix=/tmp/build/.apt/usr/lib/x86_64-linux-gnu/qt5/
+##Headers=/tmp/build/.apt/usr/include/qt5/
+
+	cat << EOF >$BUILD_DIR/$QT_BIN_DIR/qt.conf
+[Paths]
+Prefix=$BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu/qt5/
+Headers=$BUILD_DIR/.apt/usr/include/qt5/
+EOF
+}
+
+configure_export_env() {
+	topic "Setting up environment"
+
+# export PATH=/tmp/build/.apt/usr/lib/x86_64-linux-gnu/qt5/bin:$PATH
+	export PATH=$BUILD_DIR/$QT_BIN_DIR:$PATH
+	# point to where the qt platform plugins exist
+	export QT_QPA_PLATFORM_PLUGIN_PATH=$HOME/.apt/usr/lib/x86_64-linux-gnu/qt5/plugins/
+	export | grep -E -e ' (PATH|QT_QPA_PLATFORM_PLUGIN_PATH)=' >> "$BP_DIR/export"
+
+	cat << EOF >$BUILD_DIR/.profile.d/001_qt.sh
+export PATH="\$HOME/$QT_BIN_DIR:\$PATH"
+export QT_QPA_PLATFORM_PLUGIN_PATH=\$HOME/.apt/usr/lib/x86_64-linux-gnu/qt5/plugins/
+EOF
+}
+
+configure_qt
+configure_export_env
