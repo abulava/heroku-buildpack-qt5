@@ -21,11 +21,6 @@ function topic() {
 configure_qt() {
 	topic "Configuring QT, writing qt.conf"
 
-# /tmp/build/.apt/usr/lib/x86_64-linux-gnu/qt5/bin/qt.conf
-##[Paths]
-##Prefix=/tmp/build/.apt/usr/lib/x86_64-linux-gnu/qt5/
-##Headers=/tmp/build/.apt/usr/include/qt5/
-
 	cat << EOF >$BUILD_DIR/$QT_BIN_DIR/qt.conf
 [Paths]
 Prefix=$BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu/qt5/
@@ -36,7 +31,6 @@ EOF
 configure_export_env() {
 	topic "Setting up environment"
 
-# export PATH=/tmp/build/.apt/usr/lib/x86_64-linux-gnu/qt5/bin:$PATH
 	export PATH=$BUILD_DIR/$QT_BIN_DIR:$PATH
 	# point to where the qt platform plugins exist
 	export QT_QPA_PLATFORM_PLUGIN_PATH=$HOME/.apt/usr/lib/x86_64-linux-gnu/qt5/plugins/
